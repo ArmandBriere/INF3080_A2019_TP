@@ -1,32 +1,68 @@
-# Travail pratique 2 - Utilisation et développement de programmes dans un SGBDR
+# Introduction du sujet pour INF3080 A2019 
+
+### Description des travaux pratiques
+
+  Nous voulons dans ce travail, à l'aide d'un sujet d'actualité, construire, implémenter et optimiser
+  une application dans le domaine du transport de marchandises.  Votre mandat est de construire un
+  système de gestion de tarification dynamique. Le sujet sera réalisé à l'aide de deux travaux pratiques (TP1 + TP2).
+
+### Description informative (qui n'est pas à faire dans ce travail)
+
+  Le système (complet) est dit centralisé.  Ce qui veut dire que la base de données est centrale et accessible de partout.
+  Évidemment, ceci est vrai seulement à l'aide d'une composante vitale, une application Web (qui n'est pas développée dans ce cours).
+
+#### Screen capture 
+  - UI/UX demande de voyage : ![ici](../ressources/ecran1.png)
+  - UI/UX résultat de soumission : ![ici](../ressources/ecran2.png)
+
+### TP1 (ci-bas)
+
+  Vous aurez à modéliser et scripter un schéma afin de créer une base de données.  Par la suite vous devrez créer et 
+  exécuter des requêtes qui rempliront votre base de données.  Un `script` pour nous, est un fichier texte qui contient
+  des instructions SQL qui seront exécutées séquentiellement.
+  
+### TP2 (un autre énoncé sera fourni)
+  Dans la deuxième portion du travail, vous aurez à programmer et implémenter des procédures et fonctions afin de réaliser des
+  fonctionnalités requises par les utilisateurs.
+
+----
+
+# Travail pratique 1 - Modélisation et Conception d'une BD
 
 ## Objectif
 
- L'objectif général de pratiquer des notions vues et similaires à celles que l'on retrouve en entreprise ainsi
- que réaliser la conception, la modélisation, la construction et l'exploitation de bases de données dans un SGBDR. 
+ L'objectif est de réaliser par la pratique la conception, la modélisation, la construction et l'exploitation de bases de données dans un SGBDR. 
  
- Spécifiquement :
- + Comprendre un modèle entité-association relationnel normalisé;
- + Concevoir un schéma sous forme de script SQL à partir d'un modèle EAR;
- + Concevoir et exécuter des requêtes afin de charger la BD;
- + Utiliser des outils externes pour accomplir des tâches sur les BD;
- + Concevoir et exécuter des requêtes afin de vérifier le contenu la BD;
- + Concevoir des programmes qui s'exécutent dans le SGBDR;
+ + Concevoir un modèle entité-association (conceptuel);
+ + Concevoir un modèle entité-association relationnel normalisé;
+ + Concevoir un schéma sous forme de script SQL;
+ + Concevoir et exécuter des requêtes afin de charger votre BD;
+ + Concevoir et exécuter des requêtes afin de vérifier le contenu votre BD;
+ + Devenir familier avec la construction d'une BD dans un SGBDR;
+
+## Les acteurs
+
+  Votre client est une compagnie de transport avec plusieurs camions.  Les clients de
+  celle-ci sont principalement des manufacturiers qui ont besoin d'un transporteur pour 
+  livrer des marchandises. Le système est utilisable par des utilisateurs non informaticiens
+  qui sont externes. Ils ne sont pas des employés. Ils utiliseront une interface Web pour
+  faire leurs demandes et recevoir les résultats.
+
+## Lexique
+
+#### Synonymes
+ + trajet  :arrow_right: route
+ + remorque :arrow_right: equipement
+ + voyage :arrow_right: chargement
+ + manufacturier :arrow_right: client
+ + proposition de tarification :arrow_right: soumission
+ + transporteur :arrow_right: compagnie
+ + ...
+ 
+ Les mots à droite du symbole :arrow_right: devraient être ceux utilisés dans votre modèle; 
 
 ## Détails pour la réalisation
 
-### TP2
-
-- Tous les attributs clés devront être générés avec une gachette;
-- Une demande de transport, **Chargement**, sera ajouté avec la procédure p_demande();
-- Les soumissions sont calculées à l'aide de la procédure p_soumission();
-- Les soumissions acceptées deviennent des commandes et devront être sauvegardées;
-- La procédure p_commande() construit la commande pour une soumission;
-- La fonction f_prix() calcule le prix pour chacune des lignes de détails de soumission;
-- La table `route`, **est un cache**, qui contient les trajets, et leurs distances, souvent utilisés;
-- Les détails de réalisation du TP1 doivent être tous présents.
-
-### TP1
 - Les donneurs de voyage sont appelés manufacturiers;
 - Le transporteur peut avoir plusieurs camions;
 - Un camion implique deux parties, le tracteur et la remorque;
@@ -51,12 +87,12 @@
 - Le prix du carburant est au litre;
 - La consommation du tracteur est en litre pour 1 Km;
 
-## Guide pour la création des noms
+## Guide pour la création des attributs
 
   - La notation hongroise est d'usage pour nommer vos attributs.
 
 ### Abréviations acceptées (à utiliser)
-| Mot | Abréviation | Colonne |
+| Mot | Abréviation | Colonne  |
 | :----------- |:------------ | :------|
 | Latitude     | Lat   | nLat  |
 | Longitude    | Long  | nLong |
@@ -64,76 +100,107 @@
 | Destination  | Des   |        |
 | Latitude d'origine | LatOri | nLatOri |
 | Longitude destination | LongDes | nLongDes |
-| Entete de Soumission | SoumissionE | <-- Table |
-| Détail de Soumission | SoumissionD | <-- Table |
-| Entete de Commande | CommandeE | <-- Table |
-| Détail de Commande | CommandeD | <-- Table |
-
 
 ## Les entités
 
-![modele TP1](../ressources/modele-tp1.png)
 
-## Prototypage des fonctions
+### Une remorque comporte les attributs suivants : 
+ + capacité
+ + longueur
+ + largeur
+ + hauteur
 
-Les signatures sont :
-+ p_demande(pClient, nLatOri, nLongOri, nLatDes, nLongDes, nPoid, nValeur);
-+ p_soumission(pChargement);
-+ p_commande(pSoumissionE);
-+ f_prix(pSoumissionD);
+### Tables
+
+Les tables listées
+  - devront apparaître dans votre modèle conceptuel;
+  - devront être créés par votre script `01_schema.sql` tel que fourni;
+
+#### Position
+ + Position
+   - La table contiendra les positions des équipements ainsi que la disponibilité
+ 
+| Colonne | Grandeur/Taille | Description  |
+| :----------- |:------------ | :------|
+| pPosition    |     | pk|
+| cPosition    | 30  | |
+| nLat         | 8,5 | |
+| nLong        | 8,5 | |
+| bDisponible  |     |  Le camion est disponible pour prendre des voyages |
+| pCamion      |     | fk |
+
+#### Route
+ + Route
+   - La table contient des routes et le nombre de km entre l'origine et la destination
+
+| Colonne | Grandeur/Taille | Description  |
+| :----------- |:------------ | :------|
+| pRoute |    | pk|
+| cRoute | 30 | |
+| nLatOri   | 8,5 | Coordonnée latitude d'origine |
+| nLongOri  | 8,5 | Coordonnée longitude d'origine |
+| nLatDes   | 8,5 | Coordonnée latitude destination |
+| nLongDes  | 8,5 | Coordonnée longitude destination |
+| nDistance | | Distance en KM |
+
+#### TypeEquipement
+ + TypeEquipement
+   - La table contiendra les types d'équipements
+ 
+| Colonne | Grandeur/Taille | Description  |
+| :----------- |:------------ | :------|
+| pTypeEquipement    |     | pk|
+| cTypeEquipement    | 30  | |
+| nCout    | 8,2  | Coût par KM |
 
 # Livrables
 
-+ Les fichiers sont exécutés séquentiellement;
+### 00_modele.pdf
+  Vous devez modéliser le sujet conceptuellement et produire le fichier `00_modele.pdf`;
 
 ### 01_schema.sql
   Votre schéma doit être dans un fichier de type texte (souvent appelé *script*) 
   nommé `01_schema.sql` et devra contenir des commandes qui créera votre base de données alias
   schéma. Toutes les commandes utilisées sont celles du DDL.  Le fichier sera exécuté 2 fois.
   Assurez-vous qu'il n'y a pas d'erreur.
-
-### 02_sequence.sql
-
- À ce point-ci dans votre apprentissage, vous savez exactement comment créer des séquences, et pourquoi elles sont
- nécessaires. Ce fichier contient le code. 
-
-### 03_gachette.sql
-
- + Ce fichier est nécessaire pour créer toutes les gachettes. 
-
-### 04_procedure.sql
-
- + Ce fichier contiendra la création des procédures et fonctions.
-
-### Chargement avec SQL*Loader (sqlldr)
-
-+ Certaines données peuvent être importées depuis un fichier CSV ou TSV via Oracle :copyright: SQL*Loader (sqlldr).
   
-  Les fichiers suivants doivent exister :
-  + 05a_route.txt (fourni) ou peut-être `route.txt`
-  + 05a_route.ctl
-  + 05a_route.log
-  + 05a_route.sh
-  
-### 05b_charger.sql
-  Vous devez ensuite créer le *script* nommé `04_charger.sql` qui remplira votre BD.
+### 02_charger.sql
+  Vous devez ensuite créer un deuxième *script* nommé `02_charger.sql` qui remplira votre BD.
   Ce dernier doit contenir des commandes INSERT principalement. Le DML est d'usage pour
   compléter ce fichier.
+  ~~Certaines données peuvent être importées depuis un fichier CSV ou TSV.~~
 
-### 06_tester.sql
-  Vous devez dans un fichier nommé `06_tester.sql` écrire des requêtes qui vous aident 
+### 03_tester.sql
+  Vous devez dans un fichier nommé `03_tester.sql` écrire des requêtes qui vous aident 
   à réaliser un travail de qualité.  Il est toujours important de faire des tests. Puisque
-  nous ne voulons pas perdre nos tests, je vous invite à les sauvegarder ici.
+  nous ne voulons pas perdre nos tests, je vous invite à les sauvegarder dans `03_tester.sql`.
   Ce fichier n'est pas facultatif.  Mais son contenu est de votre création.  Auncune directive
   ne vous sera imposée pour sa réalisation.
 
-### 07a_query.sql
+### 04a_query.sql
+ + Écrire une requête qui retourne les soumissions générées
+   - seulement les datées du 2019-09-30; 
+   - pour le pClient { 4 };
 
-### 07b_query.sql
+### 04b_query.sql
+ + Écrire une requête qui liste les camions qui sont présentement en voyage;
 
-### 07c_query.sql
+### 04c_query.sql
+ + Écrire une requête qui retourne le nom des tables en minuscule de mon schéma en ordre décroissant;
  
-### 08_algebre-tp1.pdf
+### 04d_query.sql
+ + Écrire une requête qui retourne les attributs des entités E = { Tracteur, Camion, Equipement };
+ + Exemple de retour (projection en Algèbre relationnelle :wink: ) :
+
+| Entité | Attribut | Type  |
+| :----------- |:------------ | :------|
+| TRACTEUR    | pTracteur    | NUMERIC   |
+| ...  |   |   |
+
+### 05_algebre-tp1.pdf
+ + Réaliser, écrire en utilisant l'algèbre relationnelle :
+   - a. la requête `04a_query.sql`;
+   - b. la requête `04b_query.sql`;
 
 ### README.md
 
@@ -164,37 +231,32 @@ Les signatures sont :
 
    ## Références
 
-   - <citez vos sources ici>
+   <citez vos sources ici>
 
    ## Statut
 
-   + <indiquez si le projet est complété ou s'il y a des bogues>
+   <indiquez si le projet est complété ou s'il y a des bogues>
    
    ## Auto-évaluation de votre travail
    
-   + <j'évalue mon livrable à x points>
-   
-   ## Difficultés rencontrées
-   
-   + <1. >
-   + <2. >
+   <j'évalue mon livrable à x points>
 ~~~~
 
 # Remise
 
-  La totalité de votre travail doit être remis au plus tard le **13 décembre 2019** à **11h59**. 
-  À partir de cette date/heure, une pénalité de **12 points par jour** de retard sera appliquée.
+  La totalité de votre travail doit être remis au plus tard le **22 octobre 2019** à **23h59**. 
+  À partir de cette date/heure, une pénalité de **5 points par jour** de retard sera appliquée.
 
   La remise se fait **obligatoirement** par l'intermédiaire de l'une des plateformes de gestion de version suivantes :
-  + `GitHub https://github.com/`;
-  + ~~`GitLab https://gitlab.com/`;~~
-  + ~~`GitLab UQAM`.~~
+  + `GitHub https://github.com/`___;
+  + `GitLab https://gitlab.com/`___.
   
   **Aucune remise par courriel ne sera acceptée** (le travail sera considéré comme non remis).
 
-Le nom de votre projet, qui sera `privé` pour des raisons liées au plagiat, doit être `inf3080-a2019-tp2`
-(en minuscules). Vous devez donner un accès en mode collaboration à l'utilisateur 
+Le nom de votre projet doit être `inf3080-a2019-tp1` (en minuscules). Vous devez donner un accès 
+  en mode **lecture/écriture** (pas **admin**) à l'utilisateur 
   + `guyfrancoeur` pour les gens de INF3080-030 A2019;
+  + `ammarhamad` pour les gens de INF3080-031 A2019; GitHub seulement;
   
   Il sera ainsi possible pour le/les enseignants de commenter et noter votre travail de façon discrète.
 
@@ -210,11 +272,10 @@ Le nom de votre projet, qui sera `privé` pour des raisons liées au plagiat, do
 Les travaux seront corrigés sur le serveur __*Zeta2*__. Vous devez donc vous assurer que votre livrable
 fonctionne **sans modification** sur celui-ci.
   
-Votre travail sera évalué de façon automatisée.  Ce qui implique que vos dépôts seront
-clonés et un pull sera effectué de façon automatique. Un `pull` par jour.
+Votre travail sera évalué de façon automatisée.  Ce qui implique que vos dépôts seront clonés
+et un pull sera effectué de façon automatique. Un `pull` par jour pendant 5 jours.
 Il n'y aura pas d'humain pour faire fonctionner les programmes (scripts). 
-Votre travail sera soumis à plusieurs cas et les résultats seront évalués par un script 
-`bash` et des routines SQL ou des programmes PL/SQL.
+Votre travail sera soumis à plusieurs cas et les résultats seront évalués par un script `bash`.
 Assurez-vous de bien lire toutes les directives et les requis.
 
 La réflexion est un élément essentiel qu'il faut pratiquer. Vous devez donc réfléchir et réaliser
@@ -222,20 +283,20 @@ un travail qui soit à la hauteur de ce que vous désirez.  Soyez beau, soyez bo
 
 > > Les fichiers seront soumis au détecteur de plagiat. Faites attention à la provenance de vos idées.
 
-# Barème de correction (à titre indicatif draft à refaire)
+# Barème de correction (à titre indicatif)
 
 | Critère | Sous-critère | Points |
 | ------- |:------------ | ------:|
-| Algèbre            | Algèbre relationnel                              | 2.0 |
-| Schéma             | Script de création du schéma                     | 5.0 |
-| Chargement sql     | Script de chargement des tables                  | 2.0 |
-| Chargement csv/tsv | Chargement de données automatisé                 | 3.0 |
-| Fonctionnalité     | Fonctionnalité, respect des exigences            | 12.0 |
-| Git clone          | récupération (droit lecture, écriture)           | 1.0 |
-| Markdown           | README.md                                        | 1.0 |
-| **Total**          |                                                  | 26.0 / 25.0 |
+| Modèle            | Modèle conceptuel ou relationnel                 | 1.0 |
+| Algèbre           | Algèbre relationnel                              | 1.0 |
+| Schéma            | Script de création du schéma                     | 5.0 |
+| Chargement        | Script de chargement des tables                  | 2.0 |
+| Fonctionnalité    | Fonctionnalité, respect et complétude            | 5.0 |
+| Git clone         | récupération (droit lecture, écriture)           | 1.0 |
+| Markdown          | README.md                                        | 1.0 |
+| **Total**         |                                                  | 16.0 / 15.0 |
 
-La note maximale possible dans résultat est 25 points.
+La note maximale possible dans résultat est 15 points. 
 
 ----
 ##### Auteur :copyright: 2019 Guy Francoeur

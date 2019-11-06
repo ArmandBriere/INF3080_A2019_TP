@@ -72,7 +72,7 @@
 
 ## Les entités
 
-![modele TP1](./modele-tp1.png)
+![modele TP1](../ressources/modele-tp1.png)
 
 ## Prototypage des fonctions
 
